@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from unittest.mock import Mock
 from changesetdb.database import Database
+from changesetdb.user import User
 
 
 class DatabaseTest(TestCase):
@@ -24,5 +25,14 @@ class DatabaseTest(TestCase):
         mock_cur = mock_connect.return_value.cursor.return_value
         mock_cur.execute = Mock()
         Database("dbname", "host", "port", "username").droptables()
+        self.assertEqual(mock_cur.execute.call_count, 1)
+        mock_connect.return_value.commit.assert_called_with()
+
+    @patch('psycopg2.connect')
+    def test_add_user(self, mock_connect):
+        mock_cur = mock_connect.return_value.cursor.return_value
+        mock_cur.execute = Mock()
+        Database("dbname", "host", "port", "username")\
+            .add_user(User("J Doe", 123))
         self.assertEqual(mock_cur.execute.call_count, 1)
         mock_connect.return_value.commit.assert_called_with()

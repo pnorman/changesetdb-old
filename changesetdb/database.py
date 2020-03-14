@@ -24,7 +24,7 @@ class Database:
                     '''tags hstore, geom Geometry(POLYGON,4326) );''')
 
         cur.execute('''CREATE TABLE osm_changeset_user ('''
-                    '''id bigint not null, name text);''')
+                    '''id bigint primary key, name text);''')
 
         cur.execute('''CREATE TABLE osm_changeset_discussion ('''
                     '''id bigint not null, user_id bigint not null,'''
@@ -34,8 +34,16 @@ class Database:
 
     def droptables(self):
         cur = self.conn.cursor()
-        cur.execute('''DROP TABLE IF EXISTS ''' +
-                    '''osm_changeset, osm_changeset_state, ''' +
+        cur.execute('''DROP TABLE IF EXISTS '''
+                    '''osm_changeset, osm_changeset_state, '''
                     '''osm_changeset_discussion CASCADE;''')
 
+        self.conn.commit()
+
+    def add_user(self, user):
+        cur = self.conn.cursor()
+        cur.execute('''INSERT INTO osm_changeset_user AS u (id, name) '''
+                    '''VALUES (%s, %s) ON CONFLICT (id) DO UPDATE '''
+                    '''SET name = EXCLUDED.name;''',
+                    (user.id, user.name))
         self.conn.commit()

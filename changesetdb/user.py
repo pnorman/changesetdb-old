@@ -8,9 +8,8 @@ class User:
 
 
 class UserHandler:
-    def __init__(self):
-        ''' Take in DB stuff, set up a user cache'''
-        pass
+    def __init__(self, db):
+        self.db = db
 
     def add(self, user):
-        print("Saving user {}".format(str(user)))
+        self.db.add_user(user)
